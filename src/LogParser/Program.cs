@@ -13,10 +13,8 @@ namespace LogParser
             Parser parser = new Parser();
             for (int i = 0; i < args.Length - 1; i++) 
             {
-                // Console.WriteLine(args[i] + args.Length);
                 if (args[i] == "--log-dir")
                 {
-                    // Console.WriteLine(args[i++]);
                     parser.LogDirectory = args[i+1];
                     i++;
                     continue;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace LogParser
 {
@@ -15,6 +16,10 @@ namespace LogParser
             try
             {
                 String outputFilePath = outputDirectory != null? outputDirectory : $"{LogDirectory}/output.csv";
+                if (!outputFilePath.Contains(".csv"))
+                {
+                    outputFilePath += ".csv";
+                }
                 string[] dirs = Directory.GetFiles(@LogDirectory, "*.log");
                 using(var fileWriter = new StreamWriter(outputFilePath))
                 try{
@@ -29,7 +34,7 @@ namespace LogParser
                 }
                 finally
                 {
-                    fileWriter.Flush();
+                    fileWriter.Close();
                 }
             }
             catch (Exception e)
@@ -48,7 +53,6 @@ namespace LogParser
                 while((line = file.ReadLine()) != null)  
                 {  
                     writeToCSV(fileWriter, line);
-                    // Console.WriteLine(line);
                 }  
             }
             catch (Exception)
@@ -62,13 +66,43 @@ namespace LogParser
         }
         public void writeToCSV(StreamWriter fileWriter, String line)
         {
+            string date = "";
+            string time = "";
+            string loggingLevel = "";
+            string info = "";
+            var match = Regex.Match(line, @"([^\s]*\s\s)",
+                RegexOptions.IgnoreCase);
+                    loggingLevel = match.Groups[1].Value;
+            if (LogLevels.Contains(loggingLevel.Trim()))
+            {
+            Console.WriteLine(loggingLevel);
+                match = Regex.Match(line, @"(\s+[^\s]*)",
+                RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    time = match.Groups[1].Value;
+                    
+                }
+
+                match = Regex.Match(line, @"([^\s]+)",
+                RegexOptions.IgnoreCase);
+                
+                if (match.Success)
+                {
+                    date = match.Groups[1].Value;
+                }
+                
+                match = Regex.Match(line, @"(\s:+[^\s]*)",
+                RegexOptions.IgnoreCase);
+                if (match.Success)
+                {
+                    info = match.Groups[1].Value;
+                }
+                var csv = new StringBuilder();
+                fileWriter.WriteLine($"{date}, {time}, {loggingLevel}, {info}");
+            }
             
-            var csv = new StringBuilder();
-            var first = "first";
-            var second = "Second";
-            //Suggestion made by KyleMit
-            // var newLine = line;
-            fileWriter.WriteLine(line);
         }
+
     }
 }
