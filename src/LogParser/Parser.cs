@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace LogParser
 {
@@ -13,11 +14,22 @@ namespace LogParser
         {
             try
             {
+                String outputFilePath = outputDirectory != null? outputDirectory : $"{LogDirectory}/output.csv";
                 string[] dirs = Directory.GetFiles(@LogDirectory, "*.log");
-            
-                foreach (string dir in dirs)
+                using(var fileWriter = new StreamWriter(outputFilePath))
+                try{
+                    foreach (string dir in dirs)
+                    {
+                        readFile(dir, fileWriter);
+                    }
+                }
+                catch (Exception)
                 {
-                    Console.WriteLine(dir);
+
+                }
+                finally
+                {
+                    fileWriter.Flush();
                 }
             }
             catch (Exception e)
@@ -25,13 +37,38 @@ namespace LogParser
                 Console.WriteLine("Could not find the directory " + e.ToString());
             }
         }
-        void readFile()
+        void readFile(String dir, StreamWriter fileWriter)
+        {
+            String line;
+            // Console.WriteLine(dir);
+            System.IO.StreamReader file =
+                new System.IO.StreamReader(@dir);  
+            try
+            {
+                while((line = file.ReadLine()) != null)  
+                {  
+                    writeToCSV(fileWriter, line);
+                    // Console.WriteLine(line);
+                }  
+            }
+            catch (Exception)
+            {
+                Console.WriteLine($"Error in reading file {dir}");
+            }
+            finally
+            {
+                file.Close();
+            }
+        }
+        public void writeToCSV(StreamWriter fileWriter, String line)
         {
             
-        }
-        public void writeToCSV()
-        {
-
+            var csv = new StringBuilder();
+            var first = "first";
+            var second = "Second";
+            //Suggestion made by KyleMit
+            // var newLine = line;
+            fileWriter.WriteLine(line);
         }
     }
 }

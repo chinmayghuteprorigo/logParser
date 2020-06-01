@@ -17,20 +17,20 @@ namespace LogParser
                 if (args[i] == "--log-dir")
                 {
                     // Console.WriteLine(args[i++]);
+                    parser.LogDirectory = args[i+1];
                     i++;
-                    parser.LogDirectory = args[i++];
                     continue;
                 }
                 if (args[i] == "--log-level")
                 {
+                    parser.LogLevels.Add(args[i+1]);
                     i++;
-                    parser.LogLevels.Add(args[i++]);
                     continue;
                 }
                 if (args[i] == "--csv")
                 {
+                    parser.outputDirectory = args[i+1];
                     i++;
-                    parser.outputDirectory = args[i++];
                     continue;
                 }
             }
