@@ -23,7 +23,8 @@ namespace LogParser
                 string[] dirs = Directory.GetFiles(@LogDirectory, "*.log");
                 using(var fileWriter = new StreamWriter(outputFilePath))
                 try{
-                    int counter = 0;
+                    int counter = 1;
+                    fileWriter.WriteLine("Count, Date, Time, Logging Level, Info");
                     foreach (string dir in dirs)
                     {
                         readFile(dir, fileWriter, ref counter);
@@ -31,7 +32,7 @@ namespace LogParser
                 }
                 catch (Exception)
                 {
-
+                    Console.WriteLine("Something went wrong, Please try again.");
                 }
                 finally
                 {
@@ -53,7 +54,7 @@ namespace LogParser
                 while((line = file.ReadLine()) != null)  
                 {  
                     writeToCSV(fileWriter, line, ref counter);
-                }  
+                }
             }
             catch (Exception)
             {
@@ -72,16 +73,7 @@ namespace LogParser
             string info = "";
             var match = Regex.Match(line, @"([^\s]*\s\s)",
                 RegexOptions.IgnoreCase);
-                    loggingLevel = match.Groups[1].Value;
-            // string logLevels = LogLevels.ToString();
-            bool isTrue = false;
-            for (int i= 0; i < LogLevels.Count; i++)
-            {
-                if(LogLevels[i] == loggingLevel)
-                {
-                    isTrue = true;
-                }
-            }
+            loggingLevel = match.Groups[1].Value;
             if (LogLevels.Contains(loggingLevel.Trim()))
             {
                 match = Regex.Match(line, @"(\s+[^\s]*)",
@@ -109,8 +101,7 @@ namespace LogParser
                 var csv = new StringBuilder();
                 fileWriter.WriteLine($"{counter},{date}, {time}, {loggingLevel}, {info}");
                 counter++;
-            }
-            
+            }           
         }
 
     }
