@@ -23,9 +23,10 @@ namespace LogParser
                 string[] dirs = Directory.GetFiles(@LogDirectory, "*.log");
                 using(var fileWriter = new StreamWriter(outputFilePath))
                 try{
+                    int counter = 0;
                     foreach (string dir in dirs)
                     {
-                        readFile(dir, fileWriter);
+                        readFile(dir, fileWriter, ref counter);
                     }
                 }
                 catch (Exception)
@@ -42,17 +43,16 @@ namespace LogParser
                 Console.WriteLine("Could not find the directory " + e.ToString());
             }
         }
-        void readFile(String dir, StreamWriter fileWriter)
+        void readFile(String dir, StreamWriter fileWriter, ref int counter)
         {
             String line;
-            // Console.WriteLine(dir);
             System.IO.StreamReader file =
                 new System.IO.StreamReader(@dir);  
             try
             {
                 while((line = file.ReadLine()) != null)  
                 {  
-                    writeToCSV(fileWriter, line);
+                    writeToCSV(fileWriter, line, ref counter);
                 }  
             }
             catch (Exception)
@@ -64,7 +64,7 @@ namespace LogParser
                 file.Close();
             }
         }
-        public void writeToCSV(StreamWriter fileWriter, String line)
+        public void writeToCSV(StreamWriter fileWriter, String line, ref int counter)
         {
             string date = "";
             string time = "";
@@ -73,9 +73,17 @@ namespace LogParser
             var match = Regex.Match(line, @"([^\s]*\s\s)",
                 RegexOptions.IgnoreCase);
                     loggingLevel = match.Groups[1].Value;
+            // string logLevels = LogLevels.ToString();
+            bool isTrue = false;
+            for (int i= 0; i < LogLevels.Count; i++)
+            {
+                if(LogLevels[i] == loggingLevel)
+                {
+                    isTrue = true;
+                }
+            }
             if (LogLevels.Contains(loggingLevel.Trim()))
             {
-            Console.WriteLine(loggingLevel);
                 match = Regex.Match(line, @"(\s+[^\s]*)",
                 RegexOptions.IgnoreCase);
                 if (match.Success)
@@ -99,7 +107,8 @@ namespace LogParser
                     info = match.Groups[1].Value;
                 }
                 var csv = new StringBuilder();
-                fileWriter.WriteLine($"{date}, {time}, {loggingLevel}, {info}");
+                fileWriter.WriteLine($"{counter},{date}, {time}, {loggingLevel}, {info}");
+                counter++;
             }
             
         }
