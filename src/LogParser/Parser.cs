@@ -30,7 +30,8 @@ namespace LogParser
                 using(var fileWriter = new StreamWriter(outputFilePath))
                 try{
                     int counter = 1;
-                    fileWriter.WriteLine("Count, Date, Time, Logging Level, Info");
+                    fileWriter.WriteLine("Count, Date, Time, Logging Level, Information");
+                    //for each file in directory
                     foreach (string dir in dirs)
                     {
                         string[] fileText = readFile(dir);
@@ -56,7 +57,6 @@ namespace LogParser
         }
         public string[] readFile(String dir)
         {
-            Console.WriteLine("text");
             try
             {
                  string[] readText = File.ReadAllLines(dir);
@@ -95,14 +95,14 @@ namespace LogParser
                     date = match.Groups[1].Value;
                 }
                 
-                match = Regex.Match(line, @"(\s:+[^\s]*)",
+                match = Regex.Match(line, @"(\s:.+[^\s]*)",
                 RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
                     info = match.Groups[1].Value;
                 }
                 var csv = new StringBuilder();
-                fileWriter.WriteLine($"{counter},{date}, {time}, {loggingLevel}, {info}");
+                fileWriter.WriteLine($"{counter}, {date}, {time}, {loggingLevel}, {info}");
                 counter++;
             }           
         }

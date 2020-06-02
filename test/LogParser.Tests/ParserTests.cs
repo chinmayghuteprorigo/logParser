@@ -10,7 +10,7 @@ namespace LogParser.Tests
         {
             Parser parser = new Parser();
             string[] text = parser.readFile("../../../cms.log");
-            Xunit.Assert.Same(151,text.Length);
+            Xunit.Assert.Same(151, text.Length);
         }
         [Fact]
         public void getFileShouldReturnNullIfFileIsNotPresent()
