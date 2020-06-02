@@ -24,7 +24,7 @@ namespace LogParser
                 }
                 if (args[i] == "--log-level")
                 {
-                    parser.LogLevels.Add(args[i+1]);
+                    parser.LogLevels.Add(args[i+1].ToUpper());
                     i++;
                     isLoggingLevelPresent = true;
                     continue;
