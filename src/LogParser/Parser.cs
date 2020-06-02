@@ -6,20 +6,26 @@ using System.Text.RegularExpressions;
 
 namespace LogParser
 {
-    class Parser
+    public class Parser
     {
         public String LogDirectory;
         public List<String> LogLevels = new List<String>();
         public String outputDirectory;
+
+        string getOutputFile(string outputDirectory)
+        {
+            String outputFilePath = outputDirectory != null? outputDirectory : $"{LogDirectory}/output.csv";
+            if (!outputFilePath.Contains(".csv"))
+            {
+                outputFilePath += ".csv";
+            }
+            return outputFilePath;
+        } 
         public void getFilesData()
         {
             try
             {
-                String outputFilePath = outputDirectory != null? outputDirectory : $"{LogDirectory}/output.csv";
-                if (!outputFilePath.Contains(".csv"))
-                {
-                    outputFilePath += ".csv";
-                }
+                string outputFilePath = getOutputFile(outputDirectory);
                 string[] dirs = Directory.GetFiles(@LogDirectory, "*.log");
                 using(var fileWriter = new StreamWriter(outputFilePath))
                 try{
@@ -27,7 +33,11 @@ namespace LogParser
                     fileWriter.WriteLine("Count, Date, Time, Logging Level, Info");
                     foreach (string dir in dirs)
                     {
-                        readFile(dir, fileWriter, ref counter);
+                        string[] fileText = readFile(dir);
+                        foreach(var line in fileText)
+                        {
+                            writeToCSV(fileWriter, line, ref counter, LogLevels);
+                        }
                     }
                 }
                 catch (Exception)
@@ -44,28 +54,21 @@ namespace LogParser
                 Console.WriteLine("Could not find the directory " + e.ToString());
             }
         }
-        void readFile(String dir, StreamWriter fileWriter, ref int counter)
+        public string[] readFile(String dir)
         {
-            String line;
-            System.IO.StreamReader file =
-                new System.IO.StreamReader(@dir);  
+            Console.WriteLine("text");
             try
             {
-                while((line = file.ReadLine()) != null)  
-                {  
-                    writeToCSV(fileWriter, line, ref counter);
-                }
+                 string[] readText = File.ReadAllLines(dir);
+                 return readText;
             }
             catch (Exception)
             {
                 Console.WriteLine($"Error in reading file {dir}");
             }
-            finally
-            {
-                file.Close();
-            }
+            return null;
         }
-        public void writeToCSV(StreamWriter fileWriter, String line, ref int counter)
+        public void writeToCSV(StreamWriter fileWriter, String line, ref int counter, List<string> logLevels)
         {
             string date = "";
             string time = "";
@@ -74,7 +77,7 @@ namespace LogParser
             var match = Regex.Match(line, @"([^\s]*\s\s)",
                 RegexOptions.IgnoreCase);
             loggingLevel = match.Groups[1].Value;
-            if (LogLevels.Contains(loggingLevel.Trim()))
+            if (logLevels.Contains(loggingLevel.Trim()))
             {
                 match = Regex.Match(line, @"(\s+[^\s]*)",
                 RegexOptions.IgnoreCase);
